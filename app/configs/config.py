@@ -1,12 +1,51 @@
-from config_default import configs
+class Dict(dict):
+    """
+    Simple dict but support access as x.y style.
+    """
 
+    def __init__(self, names=(), values=(), **kwargs):
+        super(Dict, self).__init__(**kwargs)
+        for k, v in zip(names, values):
+            self[k] = v
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(f"'Dict' object has no attribute '{key}'")
+
+    def __setattr__(self, key, value):
+        self[key] = value
+
+
+def merge(defaults, override):
+    r = {}
+    for k, v in defaults.items():
+        if k in override:
+            if isinstance(v, dict):
+                r[k] = merge(v, override[k])
+            else:
+                r[k] = override[k]
+        else:
+            r[k] = v
+    return r
+
+
+def toDict(d):
+    D = Dict()
+    for k, v in d.items():
+        D[k] = toDict(v) if isinstance(v, dict) else v
+    return D
+
+
+import configs.config_default as config_default
+
+configs = config_default.configs
 try:
-    import config_override
+    import configs.config_override as config_override
 
-    configs |= config_override.configs
+    configs = merge(configs, config_override.configs)
 except ImportError:
     pass
 
-configs["db"][
-    "url"
-] = f"mysql+pymysql://{configs['db']['user']}:{configs['db']['password']}@{configs['db']['host']}:{configs['db']['port']}/{configs['db']['database']}?charset=utf8mb4"
+configs = toDict(configs)
