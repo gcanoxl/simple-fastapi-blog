@@ -1,6 +1,10 @@
 import fastapi
 from fastapi import status
 
+from app import db, models
+
+models.Base.metadata.create_all(bind=db.engine)
+
 app = fastapi.FastAPI()
 
 
