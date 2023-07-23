@@ -14,10 +14,18 @@ def test_user_signup():
     response = client.post("/api/users/signup", json=payload)
     assert response.status_code == 201
     assert response.json() == {
-        "status": "User Added",
-        "data": {
-            "id": 1,
-            "email": "test@test.com",
-            "username": "test",
-        },
+        "id": 1,
+        "email": "test@test.com",
+        "username": "test",
     }
+
+
+def test_user_signup_existing_email():
+    payload = {
+        "email": "test@test.com",
+        "username": "test2",
+        "password": "test456",
+    }
+    response = client.post("/api/users/signup", json=payload)
+    assert response.status_code == 409
+    assert response.json() == {"detail": "Email already exists"}
