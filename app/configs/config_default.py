@@ -7,6 +7,7 @@ configs = {
         "database": "fastapiblog",
     },
     "jwt": {
-        "secret": "REPLACE WITH YOUR SECRET",
+        "secret": "tempsecret",
+        "algorithm": "HS256",
     },
 }

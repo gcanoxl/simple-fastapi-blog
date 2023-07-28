@@ -1,7 +1,9 @@
 from fastapi.testclient import TestClient
 
 from app import db
+from app.auth.auth_handler import signJWT
 from app.main import app
+from app.schemas import UserSchema
 
 client = TestClient(app)
 
@@ -23,6 +25,7 @@ class TestUserSignUp(unittest.TestCase):
         assert response.json()["id"] == 1
         assert response.json()["username"] == "test"
         assert "password" not in response.json()
+        assert "token" in response.json()
 
     def test_user_signup_existing_username(self):
         payload = {

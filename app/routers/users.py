@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models
+from app.auth.auth_handler import signJWT
 from app.db import get_db
 from app.schemas import UserSchema
 
@@ -25,4 +26,5 @@ async def user_signup(user: UserSchema, db: Session = Depends(get_db)):
     return {
         "id": new_user.id,
         "username": new_user.username,
+        "token": signJWT(new_user),
     }
