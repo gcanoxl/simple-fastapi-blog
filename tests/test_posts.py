@@ -37,7 +37,7 @@ class TestPosts(unittest.TestCase):
         response = client.post(
             "/api/posts/",
             json=payload,
-            headers={"X-Token": self.token},
+            headers={"Authorization": "Bearer " + self.token},
         )
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authorized"}
@@ -55,7 +55,7 @@ class TestPosts(unittest.TestCase):
         response = client.post(
             "/api/posts/",
             json=payload,
-            headers={"X-Token": self.token},
+            headers={"Authorization": "Bearer " + self.token},
         )
         assert response.status_code == 201
         assert response.json() == {

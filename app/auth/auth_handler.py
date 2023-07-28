@@ -21,9 +21,9 @@ def signJWT(user: UserSchema):
     return token
 
 
-def decodeJWT(token) -> dict | None:
+def decodeJWT(token) -> UserSchema | None:
     try:
         payload = jwt.decode(token, secrets, algorithms=algorithms)
-        return payload if payload["expires"] >= time.time() else None
+        return UserSchema(**payload) if payload["expires"] >= time.time() else None
     except:
         return None
