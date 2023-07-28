@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models
-from app.auth.auth_handler import signJWT
+from app.auth.auth_handler import decodeJWT, signJWT
 from app.db import get_db
 from app.schemas import UserSchema
 
@@ -27,4 +27,21 @@ async def user_signup(user: UserSchema, db: Session = Depends(get_db)):
         "id": new_user.id,
         "username": new_user.username,
         "token": signJWT(new_user),
+    }
+
+
+@router.post("/login", status_code=status.HTTP_200_OK)
+async def user_login(user: UserSchema, db: Session = Depends(get_db)):
+    db_user = (
+        db.query(models.User).filter(models.User.username == user.username).first()
+    )
+    if not db_user or db_user.password != user.password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+        )
+    return {
+        "id": db_user.id,
+        "username": db_user.username,
+        "token": signJWT(db_user),
     }

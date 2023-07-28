@@ -62,20 +62,21 @@ class TestUserLogin(unittest.TestCase):
         assert response.status_code == 200
         assert response.json()["id"] == 1
         assert response.json()["username"] == "test"
+        assert "token" in response.json()
 
-    def test_user_login_wrong_password(self):
+    def test_user_login_user_not_found(self):
         payload = {
-            "username": "test",
-            "password": "test456",
+            "username": "test1",
+            "password": "test123",
         }
         response = client.post("/api/users/login", json=payload)
         assert response.status_code == 401
         assert response.json() == {"detail": "Incorrect username or password"}
 
-    def test_user_login_wrong_username(self):
+    def test_user_login_wrong_password(self):
         payload = {
-            "username": "test1",
-            "password": "test123",
+            "username": "test",
+            "password": "test456",
         }
         response = client.post("/api/users/login", json=payload)
         assert response.status_code == 401
