@@ -10,11 +10,13 @@ router = APIRouter()
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def user_signup(user: UserSchema, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.email == user.email).first()
+    db_user = (
+        db.query(models.User).filter(models.User.username == user.username).first()
+    )
     if db_user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Email already exists",
+            detail="Username already exists",
         )
     new_user = models.User(**user.model_dump())
     db.add(new_user)
@@ -22,6 +24,5 @@ async def user_signup(user: UserSchema, db: Session = Depends(get_db)):
     db.refresh(new_user)
     return {
         "id": new_user.id,
-        "email": new_user.email,
         "username": new_user.username,
     }
