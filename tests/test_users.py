@@ -29,7 +29,13 @@ class TestUser(unittest.TestCase):
     def test_user_signup_existing_email(self):
         payload = {
             "email": "test@test.com",
-            "username": "test",
+            "username": "test1",
+            "password": "test123",
+        }
+        response = client.post("/api/users/signup", json=payload)
+        payload = {
+            "email": "test@test.com",
+            "username": "test2",
             "password": "test456",
         }
         response = client.post("/api/users/signup", json=payload)

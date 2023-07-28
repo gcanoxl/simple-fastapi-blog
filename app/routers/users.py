@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models
@@ -10,6 +10,12 @@ router = APIRouter()
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def user_signup(user: UserSchema, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.email == user.email).first()
+    if db_user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already exists",
+        )
     new_user = models.User(**user.model_dump())
     db.add(new_user)
     db.commit()
