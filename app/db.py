@@ -6,7 +6,7 @@ from .configs import config
 dbconfig = config.configs.db
 DATABASE_URL = f"mysql+pymysql://{dbconfig['user']}:{dbconfig['password']}@{dbconfig['host']}:{dbconfig['port']}/{dbconfig['database']}?charset=utf8mb4"
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(
     autocommit=False,
