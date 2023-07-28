@@ -19,13 +19,14 @@ async def user_signup(user: UserSchema, db: Session = Depends(get_db)):
             status_code=status.HTTP_409_CONFLICT,
             detail="Username already exists",
         )
-    new_user = models.User(**user.model_dump())
+    new_user = models.User(username=user.username, password=user.password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return {
         "id": new_user.id,
         "username": new_user.username,
+        "is_admin": new_user.is_admin,
         "token": signJWT(new_user),
     }
 

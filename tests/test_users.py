@@ -39,6 +39,20 @@ class TestUserSignUp(unittest.TestCase):
         assert response.status_code == 409
         assert response.json() == {"detail": "Username already exists"}
 
+    def test_user_signup_invalid_is_admin(self):
+        payload = {
+            "username": "test",
+            "password": "test123",
+            "is_admin": True,
+        }
+        response = client.post("/api/users/signup", json=payload)
+        assert response.status_code == 201
+        assert response.json()["id"] == 1
+        assert response.json()["username"] == "test"
+        assert "password" not in response.json()
+        assert "token" in response.json()
+        assert response.json()["is_admin"] == False
+
 
 class TestUserLogin(unittest.TestCase):
     def setUp(self):
