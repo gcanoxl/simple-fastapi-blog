@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models
-from app.auth.auth_handler import decodeJWT, signJWT
+from app.auth.auth_handler import signJWT
 from app.db import get_db
 from app.schemas import UserSchema
 

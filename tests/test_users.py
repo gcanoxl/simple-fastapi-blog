@@ -1,9 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app import db
-from app.auth.auth_handler import signJWT
 from app.main import app
-from app.schemas import UserSchema
 
 client = TestClient(app)
 

@@ -9,3 +9,11 @@ class UserSchema(BaseModel):
     username: str
     password: str
     is_admin: bool | None = False
+
+
+class PostSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int | None = None
+    title: str
+    content: str
+    views: int | None = 0
