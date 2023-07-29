@@ -243,6 +243,7 @@ class TestPostsUpdate(unittest.TestCase):
         }
 
     def test_update_unexisting(self):
+        # TODO: refactor
         session = db.SessionLocal()
         session.query(models.User).filter(models.User.username == "testuser").update(
             {"is_admin": True}
@@ -265,3 +266,60 @@ class TestPostsUpdate(unittest.TestCase):
         )
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
+
+
+class TestPostsDelete(unittest.TestCase):
+    def setUp(self):
+        db.Base.metadata.drop_all(bind=db.engine)
+        db.Base.metadata.create_all(bind=db.engine)
+        session = db.SessionLocal()
+        session.add_all(
+            [
+                models.Post(title="Test Post 1", content="This is a test post."),
+                models.Post(title="Test Post 2", content="This is a test post."),
+            ]
+        )
+        session.commit()
+        session.close()
+        payload = {
+            "username": "testuser",
+            "password": "testpassword",
+        }
+        response = client.post("/api/users/signup", json=payload)
+        assert response.status_code == 201
+        self.token = response.json()["token"]
+
+    def test_delete_one(self):
+        update_admin()
+        response = client.delete(
+            "/api/posts/1",
+            headers={"Authorization": "Bearer " + self.token},
+        )
+        assert response.status_code == 200
+        assert response.json() == {"detail": "Post deleted"}
+
+    def test_delete_unexisting(self):
+        update_admin()
+        response = client.delete(
+            "/api/posts/3",
+            headers={"Authorization": "Bearer " + self.token},
+        )
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Post not found"}
+
+    def test_delete_unauthorized(self):
+        response = client.delete(
+            "/api/posts/1",
+            headers={"Authorization": "Bearer " + self.token},
+        )
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Not authenticated"}
+
+
+def update_admin(username: str = "testuser"):
+    session = db.SessionLocal()
+    session.query(models.User).filter(models.User.username == "testuser").update(
+        {"is_admin": True}
+    )
+    session.commit()
+    session.close()
