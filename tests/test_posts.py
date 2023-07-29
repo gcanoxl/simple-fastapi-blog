@@ -96,15 +96,10 @@ class TestPostsGet(unittest.TestCase):
         response = client.get("/api/posts/2")
         assert response.status_code == 200
         assert response.json() == {
-            "count": 1,
-            "posts": [
-                {
-                    "id": 2,
-                    "title": "Test Post 2",
-                    "content": "This is a test post.",
-                    "views": 0,
-                }
-            ],
+            "id": 2,
+            "title": "Test Post 2",
+            "content": "This is a test post.",
+            "views": 0,
         }
 
     def test_posts_get_unexisting(self):

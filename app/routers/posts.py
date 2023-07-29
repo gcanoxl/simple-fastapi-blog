@@ -44,13 +44,22 @@ async def post_add(
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
+async def posts_get_number(db: Session = Depends(get_db)):
+    count = db.query(models.Post).count()
+    return {"count": count}
+
+
+@router.get("/{post_id}", status_code=status.HTTP_200_OK)
 async def posts_get(
-    posts_id: int | None = None,
+    post_id: int,
     db: Session = Depends(get_db),
 ):
-    count = db.query(models.Post).count()
-    if not posts_id:
-        # return count
-        return {"count": count}
-
-    return posts_id
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return {
+        "id": post.id,
+        "title": post.title,
+        "content": post.content,
+        "views": post.views,
+    }
