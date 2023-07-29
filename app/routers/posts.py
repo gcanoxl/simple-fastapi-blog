@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models
@@ -44,10 +44,11 @@ async def post_add(
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-async def posts_get_count(db: Session = Depends(get_db)):
-    # get the count of posts
-    count = db.query(models.Post).count()
-    return {"count": count}
+async def posts_get_count(
+    db: Session = Depends(get_db),
+):
+    total_count = db.query(models.Post).count()
+    return {"count": total_count}
 
 
 @router.get("/{post_id}", status_code=status.HTTP_200_OK)

@@ -107,15 +107,15 @@ class TestPostsGet(unittest.TestCase):
         assert response.status_code == 404
         assert response.json() == {"detail": "Post not found"}
 
-    def test_posts_get_list(self):
-        response = client.get("/api/posts/?limit=2&offset=1")
+    def test_posts_get_multiple(self):
+        response = client.get("/api/posts/?1,3,4")
         assert response.status_code == 200
         assert response.json() == {
-            "count": 2,
+            "count": 3,
             "posts": [
                 {
-                    "id": 2,
-                    "title": "Test Post 2",
+                    "id": 1,
+                    "title": "Test Post 1",
                     "content": "This is a test post.",
                     "views": 0,
                 },
@@ -125,13 +125,11 @@ class TestPostsGet(unittest.TestCase):
                     "content": "This is a test post.",
                     "views": 0,
                 },
+                {
+                    "id": 4,
+                    "title": "Test Post 4",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
             ],
-        }
-
-    def test_posts_get_list_overflow(self):
-        response = client.get("/api/posts/?limit=2&offset=5")
-        assert response.status_code == 200
-        assert response.json() == {
-            "count": 5,
-            "posts": [],
         }
