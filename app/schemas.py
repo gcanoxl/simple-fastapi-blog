@@ -20,5 +20,6 @@ class PostSchema(BaseModel):
 class CommentSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int | None = None
+    user_id: int | None = None
     post_id: int
     content: str

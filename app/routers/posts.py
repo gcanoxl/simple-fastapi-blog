@@ -30,7 +30,7 @@ async def post_add(
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-async def posts_get_number(
+async def posts_get_list(
     db: Session = Depends(get_db),
     limit: int | None = None,
     offset: int = 0,

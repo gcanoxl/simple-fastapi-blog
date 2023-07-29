@@ -7,11 +7,13 @@ models.Base.metadata.create_all(bind=db.engine)
 
 app = fastapi.FastAPI()
 
+from app.routers.comments import router as comments_router
 from app.routers.posts import router as posts_router
 from app.routers.users import router as users_router
 
 app.include_router(users_router, prefix="/api/users", tags=["users"])
 app.include_router(posts_router, prefix="/api/posts", tags=["posts"])
+app.include_router(comments_router, prefix="/api/comments", tags=["comments"])
 
 
 @app.get(
