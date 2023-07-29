@@ -36,7 +36,7 @@ async def user_login(user: UserSchema, db: Session = Depends(get_db)):
     db_user = (
         db.query(models.User).filter(models.User.username == user.username).first()
     )
-    if not db_user or db_user.password != user.password:
+    if not db_user or (db_user.password != user.password):  # pyright: ignore
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

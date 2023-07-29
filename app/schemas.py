@@ -7,7 +7,7 @@ class UserSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int | None = None
     username: str
-    password: str
+    password: str | None = None
     is_admin: bool | None = False
 
 

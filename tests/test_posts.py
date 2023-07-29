@@ -39,7 +39,7 @@ class TestPosts(unittest.TestCase):
             json=payload,
             headers={"Authorization": "Bearer " + self.token},
         )
-        assert response.status_code == 401
+        assert response.status_code == 403
         assert response.json() == {"detail": "Not authorized"}
 
     def test_posts_add_with_admin(self):

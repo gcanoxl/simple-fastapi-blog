@@ -14,7 +14,6 @@ def signJWT(user: UserSchema):
     payload = {
         "id": user.id,
         "username": user.username,
-        "password": user.password,
         "expires": time.time() + 3600 * 24 * 7,
     }
     token = jwt.encode(payload, secrets, algorithm=algorithms)
