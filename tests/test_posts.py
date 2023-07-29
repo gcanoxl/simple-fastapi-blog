@@ -264,6 +264,14 @@ class TestPostsUpdate(unittest.TestCase):
             json={"title": "Updated title", "content": "Updated content"},
             headers={"Authorization": "Bearer " + self.token},
         )
+        assert response.status_code == 403
+        assert response.json() == {"detail": "User is not admin"}
+
+    def test_update_without_token(self):
+        response = client.put(
+            "/api/posts/1",
+            json={"title": "Updated title", "content": "Updated content"},
+        )
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
 
@@ -312,6 +320,11 @@ class TestPostsDelete(unittest.TestCase):
             "/api/posts/1",
             headers={"Authorization": "Bearer " + self.token},
         )
+        assert response.status_code == 403
+        assert response.json() == {"detail": "Not authenticated"}
+
+    def test_delete_without_token(self):
+        response = client.delete("/api/posts/1")
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
 

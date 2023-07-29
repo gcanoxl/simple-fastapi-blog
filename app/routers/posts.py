@@ -90,3 +90,32 @@ async def posts_get(
         "content": post.content,
         "views": post.views,
     }
+
+
+@router.put("/{post_id}", status_code=status.HTTP_200_OK)
+async def posts_update(
+    post_id: int,
+    post: PostSchema,
+    db: Session = Depends(get_db),
+    user: UserSchema = Depends(get_current_user),
+):
+    if not user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="User is not admin"
+        )
+    db_post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if db_post is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
+        )
+    db.query(models.Post).filter(models.Post.id == post_id).update(
+        {"title": post.title, "content": post.content}
+    )
+    db.commit()
+    db.refresh(db_post)
+    return {
+        "id": db_post.id,
+        "title": db_post.title,
+        "content": db_post.content,
+        "views": db_post.views,
+    }
