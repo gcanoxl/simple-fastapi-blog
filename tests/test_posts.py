@@ -40,7 +40,7 @@ class TestPosts(unittest.TestCase):
             headers={"Authorization": "Bearer " + self.token},
         )
         assert response.status_code == 403
-        assert response.json() == {"detail": "Not authorized"}
+        assert response.json() == {"detail": "User is not admin"}
 
     def test_posts_add_with_admin(self):
         session = db.SessionLocal()
