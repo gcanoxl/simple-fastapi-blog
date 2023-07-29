@@ -321,7 +321,7 @@ class TestPostsDelete(unittest.TestCase):
             headers={"Authorization": "Bearer " + self.token},
         )
         assert response.status_code == 403
-        assert response.json() == {"detail": "Not authenticated"}
+        assert response.json() == {"detail": "User is not admin"}
 
     def test_delete_without_token(self):
         response = client.delete("/api/posts/1")
