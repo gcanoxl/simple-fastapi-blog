@@ -97,7 +97,7 @@ class TestPostsGet(unittest.TestCase):
         assert response.status_code == 200
         assert response.json() == {
             "id": 2,
-            "title": "Test Post 1",
+            "title": "Test Post 2",
             "content": "This is a test post.",
             "views": 0,
         }
@@ -115,13 +115,13 @@ class TestPostsGet(unittest.TestCase):
             "posts": [
                 {
                     "id": 2,
-                    "title": "Test Post 1",
+                    "title": "Test Post 2",
                     "content": "This is a test post.",
                     "views": 0,
                 },
                 {
                     "id": 3,
-                    "title": "Test Post 2",
+                    "title": "Test Post 3",
                     "content": "This is a test post.",
                     "views": 0,
                 },

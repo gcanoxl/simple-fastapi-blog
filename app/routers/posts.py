@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app import models
@@ -40,4 +40,24 @@ async def post_add(
         "title": new_post.title,
         "content": new_post.content,
         "views": new_post.views,
+    }
+
+
+@router.get("/", status_code=status.HTTP_200_OK)
+async def posts_get_count(db: Session = Depends(get_db)):
+    # get the count of posts
+    count = db.query(models.Post).count()
+    return {"count": count}
+
+
+@router.get("/{post_id}", status_code=status.HTTP_200_OK)
+async def posts_get(post_id: int, db: Session = Depends(get_db)):
+    db_post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if db_post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return {
+        "id": db_post.id,
+        "title": db_post.title,
+        "content": db_post.content,
+        "views": db_post.views,
     }
