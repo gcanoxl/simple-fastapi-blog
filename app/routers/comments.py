@@ -94,4 +94,27 @@ async def comment_update(
     }
 
 
-# @router.delete("/{comment_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{comment_id}", status_code=status.HTTP_200_OK)
+async def comment_delete(
+    comment_id: int,
+    db: Session = Depends(get_db),
+    user: UserSchema = Depends(get_current_user),
+):
+    db_comment = (
+        db.query(models.Comment).filter(models.Comment.id == comment_id).first()
+    )
+    if not db_comment:
+        raise HTTPException(
+            status_code=404,
+            detail="Comment not found",
+        )
+    if db_comment.user_id != user.id and not user.is_admin:  # pyright: ignore
+        raise HTTPException(
+            status_code=403,
+            detail="User is not comment owner",
+        )
+    db.delete(db_comment)
+    db.commit()
+    return {
+        "detail": "Comment deleted",
+    }

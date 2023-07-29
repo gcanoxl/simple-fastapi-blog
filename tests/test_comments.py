@@ -210,3 +210,68 @@ class TestCommentUpdate(unittest.TestCase):
             "post_id": 1,
             "user_id": 2,
         }
+
+
+class TestCommentDelete(unittest.TestCase):
+    def setUp(self):
+        db.Base.metadata.drop_all(bind=db.engine)
+        db.Base.metadata.create_all(bind=db.engine)
+        session = db.SessionLocal()
+        session.add_all(
+            [
+                models.Post(title="Test Post 1", content="This is a test post."),
+                models.Post(title="Test Post 2", content="This is a test post."),
+            ]
+        )
+        session.add_all(
+            [
+                models.Comment(content="Test Comment 1", post_id=1, user_id=1),
+                models.Comment(content="Test Comment 2", post_id=1, user_id=2),
+                models.Comment(content="Test Comment 3", post_id=2, user_id=2),
+            ]
+        )
+        session.commit()
+        session.close()
+        payload = {
+            "username": "testuser",
+            "password": "testpassword",
+        }
+        response = client.post("/api/users/signup", json=payload)
+        assert response.status_code == 201
+        self.token = response.json()["token"]
+
+    def test_comment_delete(self):
+        response = client.delete(
+            "/api/comments/1",
+            headers={"Authorization": f"Bearer {self.token}"},
+        )
+        assert response.status_code == 200
+        assert response.json() == {
+            "detail": "Comment deleted",
+        }
+
+    def test_comment_delete_unauthorized(self):
+        response = client.delete(
+            "/api/comments/1",
+        )
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Not authenticated"}
+
+    def test_comment_delete_by_wrong_user(self):
+        response = client.delete(
+            "/api/comments/2",
+            headers={"Authorization": f"Bearer {self.token}"},
+        )
+        assert response.status_code == 403
+        assert response.json() == {"detail": "User is not comment owner"}
+
+    def test_comment_delete_by_admin(self):
+        update_admin()
+        response = client.delete(
+            "/api/comments/2",
+            headers={"Authorization": f"Bearer {self.token}"},
+        )
+        assert response.status_code == 200
+        assert response.json() == {
+            "detail": "Comment deleted",
+        }
