@@ -8,7 +8,7 @@ from app.main import app
 client = testclient.TestClient(app)
 
 
-class TestPosts(unittest.TestCase):
+class TestPostsAdd(unittest.TestCase):
     def setUp(self):
         db.Base.metadata.drop_all(bind=db.engine)
         db.Base.metadata.create_all(bind=db.engine)
@@ -233,13 +233,7 @@ class TestPostsUpdate(unittest.TestCase):
         }
 
     def test_update_unexisting(self):
-        # TODO: refactor
-        session = db.SessionLocal()
-        session.query(models.User).filter(models.User.username == "testuser").update(
-            {"is_admin": True}
-        )
-        session.commit()
-        session.close()
+        update_admin()
         response = client.put(
             "/api/posts/3",
             json={"title": "Updated title", "content": "Updated content"},
@@ -321,7 +315,7 @@ class TestPostsDelete(unittest.TestCase):
 
 def update_admin(username: str = "testuser"):
     session = db.SessionLocal()
-    session.query(models.User).filter(models.User.username == username").update(
+    session.query(models.User).filter(models.User.username == username).update(
         {"is_admin": True}
     )
     session.commit()

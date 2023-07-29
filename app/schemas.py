@@ -15,3 +15,10 @@ class PostSchema(BaseModel):
     title: str
     content: str
     views: int | None = 0
+
+
+class CommentSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int | None = None
+    post_id: int
+    content: str
