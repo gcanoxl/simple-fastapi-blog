@@ -91,3 +91,12 @@ class TestUserLogin(unittest.TestCase):
         response = client.post("/api/users/login", json=payload)
         assert response.status_code == 401
         assert response.json() == {"detail": "Incorrect username or password"}
+
+
+# TODO: implement the following tests
+class TestUserUpdate(unittest.TestCase):
+    pass
+
+
+class TestUserDelete(unittest.TestCase):
+    pass
