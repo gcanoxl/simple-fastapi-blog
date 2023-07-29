@@ -43,12 +43,7 @@ class TestPosts(unittest.TestCase):
         assert response.json() == {"detail": "User is not admin"}
 
     def test_posts_add_with_admin(self):
-        session = db.SessionLocal()
-        session.query(models.User).filter(models.User.username == "testuser").update(
-            {"is_admin": True}
-        )
-        session.commit()
-        session.close()
+        update_admin()
         payload = {
             "title": "Test Post",
             "content": "This is a test post.",
@@ -223,12 +218,7 @@ class TestPostsUpdate(unittest.TestCase):
         self.token = response.json()["token"]
 
     def test_update_one(self):
-        session = db.SessionLocal()
-        session.query(models.User).filter(models.User.username == "testuser").update(
-            {"is_admin": True}
-        )
-        session.commit()
-        session.close()
+        update_admin()
         response = client.put(
             "/api/posts/1",
             json={"title": "Updated title", "content": "Updated content"},
@@ -331,7 +321,7 @@ class TestPostsDelete(unittest.TestCase):
 
 def update_admin(username: str = "testuser"):
     session = db.SessionLocal()
-    session.query(models.User).filter(models.User.username == "testuser").update(
+    session.query(models.User).filter(models.User.username == username").update(
         {"is_admin": True}
     )
     session.commit()
