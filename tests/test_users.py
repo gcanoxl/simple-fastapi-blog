@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from app import db
+from app import db, models
 from app.main import app
 
 client = TestClient(app)
@@ -58,12 +58,10 @@ class TestUserLogin(unittest.TestCase):
     def setUp(self):
         db.Base.metadata.drop_all(bind=db.engine)
         db.Base.metadata.create_all(bind=db.engine)
-        payload = {
-            "username": "test",
-            "password": "test123",
-        }
-        response = client.post("/api/users/signup", json=payload)
-        assert response.status_code == 201
+        session = db.SessionLocal()
+        session.add(models.User(username="test", password="test123"))
+        session.commit()
+        session.close()
 
     def test_user_login(self):
         payload = {

@@ -65,3 +65,60 @@ class TestPosts(unittest.TestCase):
             "views": 0,
         }
         session.close()
+
+
+class TestPostsGet(unittest.TestCase):
+    def setUp(self):
+        db.Base.metadata.drop_all(bind=db.engine)
+        db.Base.metadata.create_all(bind=db.engine)
+        # create 5 posts
+        session = db.SessionLocal()
+        session.add_all(
+            [
+                models.Post(title="Test Post 1", content="This is a test post."),
+                models.Post(title="Test Post 2", content="This is a test post."),
+                models.Post(title="Test Post 3", content="This is a test post."),
+                models.Post(title="Test Post 4", content="This is a test post."),
+                models.Post(title="Test Post 5", content="This is a test post."),
+            ]
+        )
+        session.commit()
+        session.close()
+
+    def test_posts_get_number(self):
+        response = client.get("/api/posts/")
+        assert response.status_code == 200
+        assert response.json() == {
+            "count": 5,
+        }
+
+    def test_posts_get_one(self):
+        response = client.get("/api/posts/2")
+        assert response.status_code == 200
+        assert response.json() == {
+            "id": 2,
+            "title": "Test Post 1",
+            "content": "This is a test post.",
+            "views": 0,
+        }
+
+    def test_posts_get_list(self):
+        response = client.get("/api/posts/?limit=2&offset=1")
+        assert response.status_code == 200
+        assert response.json() == {
+            "count": 2,
+            "posts": [
+                {
+                    "id": 2,
+                    "title": "Test Post 1",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+                {
+                    "id": 3,
+                    "title": "Test Post 2",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+            ],
+        }
