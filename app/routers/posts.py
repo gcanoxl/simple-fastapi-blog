@@ -2,25 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models
-from app.auth.auth_bearer import JWTBearer
 from app.db import get_db
+from app.routers.users import get_current_user
 from app.schemas import PostSchema, UserSchema
 
 router = APIRouter()
-
-jwt_bearer = JWTBearer()
-
-
-def get_current_user(
-    db: Session = Depends(get_db),
-    user: UserSchema = Depends(jwt_bearer),
-) -> UserSchema:
-    db_user = (
-        db.query(models.User).filter(models.User.username == user.username).first()
-    )
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
