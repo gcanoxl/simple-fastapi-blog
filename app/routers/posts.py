@@ -44,9 +44,36 @@ async def post_add(
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-async def posts_get_number(db: Session = Depends(get_db)):
-    count = db.query(models.Post).count()
-    return {"count": count}
+async def posts_get_number(
+    db: Session = Depends(get_db),
+    limit: int | None = None,
+    offset: int = 0,
+):
+    total_count = db.query(models.Post).count()
+    if limit is None:
+        return {"count": total_count}
+    if limit > total_count:
+        limit = total_count
+    if limit + offset > total_count:
+        raise HTTPException(
+            status_code=400,
+            detail="Offset + limit is greater than total number of posts",
+        )
+    db_posts = (
+        db.query(models.Post).order_by(models.Post.id).offset(offset).limit(limit).all()
+    )
+    return {
+        "count": len(db_posts),
+        "posts": [
+            {
+                "id": post.id,
+                "title": post.title,
+                "content": post.content,
+                "views": post.views,
+            }
+            for post in db_posts
+        ],
+    }
 
 
 @router.get("/{post_id}", status_code=status.HTTP_200_OK)

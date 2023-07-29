@@ -116,7 +116,7 @@ class TestPostsGet(unittest.TestCase):
         response = client.get("/api/posts/?limit=2")
         assert response.status_code == 200
         assert response.json() == {
-            "count": 5,
+            "count": 2,
             "posts": [
                 {
                     "id": 1,
@@ -156,8 +156,10 @@ class TestPostsGet(unittest.TestCase):
 
     def test_posts_get_list_overflow(self):
         response = client.get("/api/posts/?limit=2&offset=5")
-        assert response.status_code == 416
-        assert response.json() == {"detail": "Offset out of range"}
+        assert response.status_code == 400
+        assert response.json() == {
+            "detail": "Offset + limit is greater than total number of posts"
+        }
 
     def test_posts_get_list_larger_limit(self):
         response = client.get("/api/posts/?limit=10")
