@@ -48,6 +48,7 @@ class TestPosts(unittest.TestCase):
             {"is_admin": True}
         )
         session.commit()
+        session.close()
         payload = {
             "title": "Test Post",
             "content": "This is a test post.",
@@ -64,7 +65,6 @@ class TestPosts(unittest.TestCase):
             "content": "This is a test post.",
             "views": 0,
         }
-        session.close()
 
 
 class TestPostsGet(unittest.TestCase):
@@ -199,3 +199,69 @@ class TestPostsGet(unittest.TestCase):
                 },
             ],
         }
+
+
+class TestPostsUpdate(unittest.TestCase):
+    def setUp(self):
+        db.Base.metadata.drop_all(bind=db.engine)
+        db.Base.metadata.create_all(bind=db.engine)
+        session = db.SessionLocal()
+        session.add_all(
+            [
+                models.Post(title="Test Post 1", content="This is a test post."),
+                models.Post(title="Test Post 2", content="This is a test post."),
+            ]
+        )
+        session.commit()
+        session.close()
+        payload = {
+            "username": "testuser",
+            "password": "testpassword",
+        }
+        response = client.post("/api/users/signup", json=payload)
+        assert response.status_code == 201
+        self.token = response.json()["token"]
+
+    def test_update_one(self):
+        session = db.SessionLocal()
+        session.query(models.User).filter(models.User.username == "testuser").update(
+            {"is_admin": True}
+        )
+        session.commit()
+        session.close()
+        response = client.put(
+            "/api/posts/1",
+            json={"title": "Updated title", "content": "Updated content"},
+            headers={"Authorization": "Bearer " + self.token},
+        )
+        assert response.status_code == 200
+        assert response.json() == {
+            "id": 1,
+            "title": "Updated title",
+            "content": "Updated content",
+            "views": 0,
+        }
+
+    def test_update_unexisting(self):
+        session = db.SessionLocal()
+        session.query(models.User).filter(models.User.username == "testuser").update(
+            {"is_admin": True}
+        )
+        session.commit()
+        session.close()
+        response = client.put(
+            "/api/posts/3",
+            json={"title": "Updated title", "content": "Updated content"},
+            headers={"Authorization": "Bearer " + self.token},
+        )
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Post not found"}
+
+    def test_update_with_unauthorized_user(self):
+        response = client.put(
+            "/api/posts/1",
+            json={"title": "Updated title", "content": "Updated content"},
+            headers={"Authorization": "Bearer " + self.token},
+        )
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Not authenticated"}
