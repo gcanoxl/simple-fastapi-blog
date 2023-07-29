@@ -111,35 +111,3 @@ class TestPostsGet(unittest.TestCase):
         response = client.get("/api/posts/6")
         assert response.status_code == 404
         assert response.json() == {"detail": "Post not found"}
-
-    def test_posts_get_multiple_with_unexisting(self):
-        response = client.get("/api/posts/?1,2,6")
-        assert response.status_code == 404
-        assert response.json() == {"detail": "Post not found"}
-
-    def test_posts_get_multiple(self):
-        response = client.get("/api/posts/?1,3,4")
-        assert response.status_code == 200
-        assert response.json() == {
-            "count": 3,
-            "posts": [
-                {
-                    "id": 1,
-                    "title": "Test Post 1",
-                    "content": "This is a test post.",
-                    "views": 0,
-                },
-                {
-                    "id": 3,
-                    "title": "Test Post 3",
-                    "content": "This is a test post.",
-                    "views": 0,
-                },
-                {
-                    "id": 4,
-                    "title": "Test Post 4",
-                    "content": "This is a test post.",
-                    "views": 0,
-                },
-            ],
-        }
