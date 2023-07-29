@@ -106,3 +106,94 @@ class TestPostsGet(unittest.TestCase):
         response = client.get("/api/posts/6")
         assert response.status_code == 404
         assert response.json() == {"detail": "Post not found"}
+
+    def test_posts_get_unexisting_negative(self):
+        response = client.get("/api/posts/-1")
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Post not found"}
+
+    def test_posts_get_list(self):
+        response = client.get("/api/posts/?limit=2")
+        assert response.status_code == 200
+        assert response.json() == {
+            "count": 5,
+            "posts": [
+                {
+                    "id": 1,
+                    "title": "Test Post 1",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+                {
+                    "id": 2,
+                    "title": "Test Post 2",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+            ],
+        }
+
+    def test_posts_get_list_with_offset(self):
+        response = client.get("/api/posts/?limit=2&offset=2")
+        assert response.status_code == 200
+        assert response.json() == {
+            "count": 2,
+            "posts": [
+                {
+                    "id": 3,
+                    "title": "Test Post 3",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+                {
+                    "id": 4,
+                    "title": "Test Post 4",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+            ],
+        }
+
+    def test_posts_get_list_overflow(self):
+        response = client.get("/api/posts/?limit=2&offset=5")
+        assert response.status_code == 416
+        assert response.json() == {"detail": "Offset out of range"}
+
+    def test_posts_get_list_larger_limit(self):
+        response = client.get("/api/posts/?limit=10")
+        assert response.status_code == 200
+        assert response.json() == {
+            "count": 5,
+            "posts": [
+                {
+                    "id": 1,
+                    "title": "Test Post 1",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+                {
+                    "id": 2,
+                    "title": "Test Post 2",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+                {
+                    "id": 3,
+                    "title": "Test Post 3",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+                {
+                    "id": 4,
+                    "title": "Test Post 4",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+                {
+                    "id": 5,
+                    "title": "Test Post 5",
+                    "content": "This is a test post.",
+                    "views": 0,
+                },
+            ],
+        }
