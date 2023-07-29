@@ -102,6 +102,11 @@ class TestPostsGet(unittest.TestCase):
             "views": 0,
         }
 
+    def test_posts_get_unexisting(self):
+        response = client.get("/api/posts/6")
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Post not found"}
+
     def test_posts_get_list(self):
         response = client.get("/api/posts/?limit=2&offset=1")
         assert response.status_code == 200
@@ -121,4 +126,12 @@ class TestPostsGet(unittest.TestCase):
                     "views": 0,
                 },
             ],
+        }
+
+    def test_posts_get_list_overflow(self):
+        response = client.get("/api/posts/?limit=2&offset=5")
+        assert response.status_code == 200
+        assert response.json() == {
+            "count": 5,
+            "posts": [],
         }
