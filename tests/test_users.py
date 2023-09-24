@@ -60,6 +60,7 @@ class TestUserLogin(unittest.TestCase):
         db.Base.metadata.create_all(bind=db.engine)
         session = db.SessionLocal()
         session.add(models.User(username="test", password="test123"))
+        session.add(models.User(username="root", password="root123", is_admin=True))
         session.commit()
         session.close()
 
@@ -72,6 +73,19 @@ class TestUserLogin(unittest.TestCase):
         assert response.status_code == 200
         assert response.json()["id"] == 1
         assert response.json()["username"] == "test"
+        assert response.json()["is_admin"] == False
+        assert "token" in response.json()
+
+    def test_admin_login(self):
+        payload = {
+            "username": "root",
+            "password": "root123",
+        }
+        response = client.post("/api/users/login", json=payload)
+        assert response.status_code == 200
+        assert response.json()["id"] == 2
+        assert response.json()["username"] == "root"
+        assert response.json()["is_admin"] == True
         assert "token" in response.json()
 
     def test_user_login_user_not_found(self):

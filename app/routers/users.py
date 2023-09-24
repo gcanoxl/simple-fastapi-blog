@@ -57,5 +57,6 @@ async def user_login(user: UserSchema, db: Session = Depends(get_db)):
     return {
         "id": db_user.id,
         "username": db_user.username,
+        "is_admin": db_user.is_admin,
         "token": signJWT(db_user),
     }
